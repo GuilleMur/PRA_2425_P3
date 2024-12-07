@@ -5,7 +5,6 @@
 template <typename V> 
 class Dict {
     public:
-         virtual ~Dict() = default;
 
    	 virtual void insert(const std::string& key, const V& value) = 0;
 
