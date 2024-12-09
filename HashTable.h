@@ -6,96 +6,107 @@
 #include "Dict.h"
 #include "TableEntry.h"
 
-#include "../PRA_2425_P1/ListLinked.h"
+#include "../PRA_2425_P1/ListLinked.h"  
 template <typename V>
 class HashTable: public Dict<V> {
+private:
+    int n;
+    int max;
+    ListLinked<TableEntry<V>>* table;
+    //Transforma la clave en un número entero dentro del HashTable
+    int h(const std::string& key) {
+        int sum = 0;
+        for (char c : key) {
+            sum += static_cast<int>(c);
+        }
+        return (sum % max + max) % max;
+    }
 
-    private:
-        int n;
-        int max;
-        ListLinked<TableEntry<V>> *table;
+public:
+    //Crea una tabla de hash con tamaño size
+    HashTable(int size) {
+        if (size <= 0) throw std::invalid_argument("Tamaño no válido");
+        table = new ListLinked<TableEntry<V>>[size];
+        max = size;
+        n = 0;
+    }
 
-        int h(std::string key){
-            int sum = 0;
-            for(int i = 0; i<key.size(); i++){
-                sum += int(key.at(i));
+    ~HashTable() {
+        delete[] table;
+    }
+
+    int capacity() {
+        return max;
+    }
+    //Sobrecarga de << para imprimir la tabla
+    friend std::ostream& operator<<(std::ostream& out, const HashTable<V>& th) {
+        for (int i = 0; i < th.max; i++) {
+            out << i << ": " << th.table[i] << std::endl;
+        }
+        return out;
+    }
+    //Sobrecarga de [] para acceder a un valor dado una clave
+    V operator[](std::string key) {
+        int aux = h(key);
+        for (int i = 0; i < table[aux].size(); i++) {
+            if (table[aux][i].key == key) {
+                return table[aux][i].value;
             }
-            return sum%max;
         }
-
-    public:
-
-        HashTable(int size){
-            table = new ListLinked<TableEntry<V>>[size];
-            max = size;
-            n = 0;
-        }
+        throw std::runtime_error("Clave no encontrada");
+    }
 
 
-        ~HashTable(){
-            delete[] table;
-        }
+    void insert(const std::string key, const V val) {
+        int aux = h(key);
 
-        int capacity(){
-            return max;
-        }   
-
-        friend std::ostream& operator<<(std::ostream &out, const HashTable<V> &th){
-            for (int i = 0; i < th.max; i++){
-                out << i << ": " << th.table[i] << std::endl;
+        for (int i = 0; i < table[aux].size(); i++) {
+            if (table[aux][i].key == key) {
+                throw std::runtime_error("Clave ya en uso");
             }
-            return out;
+        }
+        //Si la lista en la posición aux está vacía, inserta el valor en la primera posición
+        TableEntry<V> entry(key, val);
+        //agrega el valor al inicio de la lista
+        table[aux].insert(0, entry);
+        n++;
+    }
+
+
+    V search(const std::string& key) {
+        int aux = h(key);
+        if (table[aux].empty()) {
+            throw std::runtime_error("Clave no encontrada");
         }
 
-	
-        V operator[](std::string key){
-            int temp = h(key);
-            for(int i = 0; i < table[temp].size(); i++){
-                if(table[temp][i].key == key){
-                    return table[temp][i].value;
-                }
+        for (int i = 0; i < table[aux].size(); i++) {
+            if (table[aux][i].key == key) {
+                return table[aux][i].value;
             }
-            throw std::runtime_error("no existe la llave");
+        }
+        throw std::runtime_error("Clave no encontrada");
+    }
+
+    V remove(const std::string& key) {
+        int aux = h(key);
+        if (table[aux].empty()) {
+            throw std::runtime_error("Clave no encontrada");
         }
 
-       void insert(const std::string key, const V val){
-            int temp = h(key);
-            try {
-                search(key);
-            } catch (const std::runtime_error&) {
-                TableEntry<V> entry(key, val);
-                table[temp].insert(0, entry);
-                n++;
+        for (int i = 0; i < table[aux].size(); i++) {
+            if (table[aux][i].key == key) {
+                V val = table[aux][i].value;
+                table[aux].remove(i);
+                n--;
+                return val;
             }
-       }
-
-        V search(std::string key){
-            int temp = h(key);
-            for(int i = 0; i < table[temp].size(); i++){
-                if(table[temp][i].key == key){
-                    return table[temp][i].value;
-                }
-            }
-            throw std::runtime_error("No se encontro la llave");
         }
+        throw std::runtime_error("Clave no encontrada");
+    }
 
-        V remove(std::string key){
-            int temp = h(key);
-            for(int i = 0; i < table[temp].size(); i++){
-                if(table[temp][i].key == key){
-                    V temp = table[temp][i].value;
-                    table[temp].remove(i);
-                    n--;
-                    return temp;
-                }
-            }
-            throw std::runtime_error("No se encontro la llave");
-        }
-
-        int entries(){
-            return n;
-        }
-        
+    int entries() {
+        return n;
+    }
 };
 
-#endif
+#endif // HASHTABLE_H
