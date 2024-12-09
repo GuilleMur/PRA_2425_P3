@@ -61,7 +61,7 @@ public:
     }
 
 
-    void insert(std::string& key, V& val) override {
+    void insert(std::string key, V value) override {
         int aux = h(key);
 
         for (int i = 0; i < table[aux].size(); i++) {
@@ -70,12 +70,12 @@ public:
             }
         }
 
-        TableEntry<V> entry(key, val);
+        TableEntry<V> entry(key, value);
         table[aux].insert(0, entry); // Inserta al inicio de la lista
         n++;
     }
 
-    V search(std::string& key) override {
+    V search(std::string key) override {
         int aux = h(key);
         if (table[aux].empty()) {
             throw std::runtime_error("Clave no encontrada");
@@ -89,7 +89,7 @@ public:
         throw std::runtime_error("Clave no encontrada");
     }
 
-    V remove(std::string& key) override {
+    V remove(std::string key) override {
         int aux = h(key);
         if (table[aux].empty()) {
             throw std::runtime_error("Clave no encontrada");
