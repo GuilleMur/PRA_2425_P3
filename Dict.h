@@ -4,17 +4,14 @@
 
 template <typename V> 
 class Dict {
-    public:
+	public:
+	void insert(const std::string key, const V val)= 0;
 
-   	 virtual void insert(const std::string& key, const V& value) = 0;
+        V search(std::string key)= 0;
 
-	
-    	 virtual V search(const std::string& key) const = 0;
+        V remove(std::string key)= 0;
 
-
-   	 virtual V remove(const std::string& key) = 0;
-
-  	 virtual int entries() const = 0;
+        int entries()= 0;
 };
 
 #endif

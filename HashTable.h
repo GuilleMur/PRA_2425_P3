@@ -5,15 +5,16 @@
 #include <stdexcept>
 #include "Dict.h"
 #include "TableEntry.h"
+#include "../PRA_2425_P1/ListLinked.h"
 
-#include "../PRA_2425_P1/ListLinked.h"  
 template <typename V>
-class HashTable: public Dict<V> {
+class HashTable : public Dict<V> {
 private:
     int n;
     int max;
     ListLinked<TableEntry<V>>* table;
-    //Transforma la clave en un número entero dentro del HashTable
+
+    //Función para convertir el string en el índice de la tabla hash
     int h(const std::string& key) {
         int sum = 0;
         for (char c : key) {
@@ -23,7 +24,7 @@ private:
     }
 
 public:
-    //Crea una tabla de hash con tamaño size
+
     HashTable(int size) {
         if (size <= 0) throw std::invalid_argument("Tamaño no válido");
         table = new ListLinked<TableEntry<V>>[size];
@@ -35,17 +36,20 @@ public:
         delete[] table;
     }
 
+
     int capacity() {
         return max;
     }
-    //Sobrecarga de << para imprimir la tabla
+
+    //Sobrecarga de operador << para imprimir la tabla hash
     friend std::ostream& operator<<(std::ostream& out, const HashTable<V>& th) {
         for (int i = 0; i < th.max; i++) {
             out << i << ": " << th.table[i] << std::endl;
         }
         return out;
     }
-    //Sobrecarga de [] para acceder a un valor dado una clave
+
+    //Sobrecarga de operador [] para acceder a un valor dado una clave
     V operator[](std::string key) {
         int aux = h(key);
         for (int i = 0; i < table[aux].size(); i++) {
@@ -57,7 +61,7 @@ public:
     }
 
 
-    void insert(const std::string key, const V val) {
+    void insert(std::string& key, V& val) override {
         int aux = h(key);
 
         for (int i = 0; i < table[aux].size(); i++) {
@@ -65,15 +69,13 @@ public:
                 throw std::runtime_error("Clave ya en uso");
             }
         }
-        //Si la lista en la posición aux está vacía, inserta el valor en la primera posición
+
         TableEntry<V> entry(key, val);
-        //agrega el valor al inicio de la lista
-        table[aux].insert(0, entry);
+        table[aux].insert(0, entry); // Inserta al inicio de la lista
         n++;
     }
 
-
-    V search(const std::string& key) {
+    V search(std::string& key) override {
         int aux = h(key);
         if (table[aux].empty()) {
             throw std::runtime_error("Clave no encontrada");
@@ -87,7 +89,7 @@ public:
         throw std::runtime_error("Clave no encontrada");
     }
 
-    V remove(const std::string& key) {
+    V remove(std::string& key) override {
         int aux = h(key);
         if (table[aux].empty()) {
             throw std::runtime_error("Clave no encontrada");
@@ -104,9 +106,11 @@ public:
         throw std::runtime_error("Clave no encontrada");
     }
 
-    int entries() {
+
+    int entries() override {
         return n;
     }
 };
 
 #endif // HASHTABLE_H
+
