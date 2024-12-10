@@ -3,66 +3,59 @@
 
 #include <ostream>
 #include <stdexcept>
-#include "Dict.h"
-#include "BSTree.h"
-#include "TableEntry.h"
 
-#include <vector>
+#include "Dict.h"
+#include "TableEntry.h"
+#include "BSTree.h"
+
 
 template <typename V>
-class BSTreeDict : public Dict<V> {
-private:
+class BSTreeDict: public Dict<V> {
+
+    private:
     BSTree<TableEntry<V>>* tree;
 
-public:
-   
-    BSTreeDict() {
+    public:
+    BSTreeDict(){
         tree = new BSTree<TableEntry<V>>();
     }
-
-   
     ~BSTreeDict() {
-        delete tree;
+		delete tree;
+	}
+    
+	//Sobrecarga de operador <<
+    friend std::ostream& operator<<(std::ostream &out, const BSTreeDict<V> &bs){
+        out << *bs.tree << std::endl;
+        return out;
     }
 
-
-    V operator[](std::string key) override {
-        return tree->search(TableEntry<V>(key, V())).getValue();
+    V operator[](std::string key){
+        return search(key);
     }
 
+    int entries() override{ 
+        return tree->size();
+    }
 
-    void insert(std::string key, V value) override {
+    void insert(std::string key, V value) override{
         TableEntry<V> entry(key, value);
         tree->insert(entry);
     }
 
-    //Busca un valor asociado a una clave en el diccionario
-    V search(std::string key) override {
-        return tree->search(TableEntry<V>(key, V())).getValue();
+    V search(std::string key) override{
+        TableEntry<V> query(key);
+        TableEntry<V> result = tree->search(query);
+        V value = result.value;
+        return value;
     }
 
-    //Elimina una entrada clave->valor del diccionario
-    void remove(std::string key) override {
-        tree->remove(TableEntry<V>(key, V()));
-    }
-
-    //Devuelve todas las entradas clave->valor del diccionario
-    friend std::ostream& operator<<(std::ostream &out, const BSTreeDict<V> &dict) {
-    // Utilizamos la sobrecarga del operador << de BSTree.
- 	if (dict.tree) {
-   	    out << *(dict.tree);
-    	} else {
-	    out << "El diccionario está vacío.";
-    	}
-    	return out;
-	}
-
-    //Sobrecarga del operador << para imprimir el contenido del diccionario
-    friend std::ostream& operator<<(std::ostream &out, const BSTreeDict<V> &bs) {
-        out << *(bs.tree);
-        return out;
+    V remove(std::string key) override{
+        TableEntry<V> query(key);
+        TableEntry<V> result = tree->search(query);
+        V value = result.value;
+        tree->remove(query);
+        return value;
     }
 };
 
 #endif
-
