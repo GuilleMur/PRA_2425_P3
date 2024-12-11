@@ -1,6 +1,8 @@
 #ifndef DICT_H
 #define DICT_H
 #include <string>
+#include <cstddef>
+#include <stdexcept>
 
 template <typename V> 
 class Dict {

@@ -23,7 +23,7 @@ class BSTreeDict: public Dict<V> {
 		delete tree;
 	}
     
-	//Sobrecarga de operador <<
+    //Sobrecarga de operador <<
     friend std::ostream& operator<<(std::ostream &out, const BSTreeDict<V> &bs){
         out << *bs.tree << std::endl;
         return out;

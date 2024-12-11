@@ -13,72 +13,97 @@ private:
 
     
     BSNode<T>* search(BSNode<T>* n, T e) const {
-        if (!n) throw std::runtime_error("Elemento no encontrado");
-        if (e == n->elem) return n;               
-        if (e < n->elem) return search(n->left, e); 
-        return search(n->right, e);                 
+        if (n == nullptr) {
+	    throw std::runtime_error("Elemento no encontrado");
+
+	} else if (n->elem < e){
+	    return search(n->right, e);
+
+	} else if (n->elem > e){
+	    return search(n->left, e);
+	
+	} else {
+	    return n;
+	
+	}
     }
 
     BSNode<T>* insert(BSNode<T>* n, T e) {
-        if (!n) {
-            nelem++;
-            return new BSNode<T>(e);
-        }
-        if (e == n->elem) throw std::runtime_error("Elemento ya existente");
-        if (e < n->elem) n->left = insert(n->left, e);
-        else n->right = insert(n->right, e);   
+	BSNode<T>* newNode = new BSNode<T>(e);
+	if(n == nullptr){
+	    return newNode;
+
+	}else if(n->elem == e) {
+	    throw std::runtime_error("El elemento ya existe");
+
+	}else if (n->elem < e){
+	    n->right = insert(n->right, e);
+
+	} else{
+	    n->left = insert(n->left, e);
+
+	}
         return n;
     }
 
     void print_inorder(std::ostream &out, BSNode<T>* n) const {
-        if (n) {
+        if (n != nullptr) {
             print_inorder(out, n->left);
             out << n->elem << " ";
             print_inorder(out, n->right);
-        }
+        
+	}
     }
 
     BSNode<T>* remove(BSNode<T>* n, T e) {
-        if (!n) throw std::runtime_error("Elemento no encontrado");
-        if (e < n->elem) n->left = remove(n->left, e);
-        else if (e > n->elem) n->right = remove(n->right, e);
-        else {
-            if (!n->left) {
-                BSNode<T>* temp = n->right;
-                delete n;
-                nelem--;
-                return temp;
-            } else if (!n->right) {
-                BSNode<T>* temp = n->left;
-                delete n;
-                nelem--;
-                return temp;
-            }
-            T maxVal = max(n->left);
-            n->elem = maxVal;
-            n->left = remove_max(n->left);
+	if(n == nullptr){
+	    throw std::runtime_error("No existe el elemento");
+	
+	} else if (n->elem < e){
+	    n->right = remove(n->right, e);
+	
+	} else if (n-> elem > e){
+	    n->left = remove(n->left, e);
+	
+	} else {
+	    if(n->left != nullptr && n->right != nullptr){
+		  n->elem = max(n->left);
+          	  n->left = remove_max(n->left);
+	    
+	    } else {
+		  n = (n->left != nullptr) ? n->left: n->right; 
+	
+	    }
         }
-        return n;
+	return n;
     }
 
     T max(BSNode<T>* n) const {
-        while (n->right) n = n->right;
-        return n->elem; 
+	if (n == nullptr){
+	    throw std::runtime_error("Elemento no encontrado");
+	
+	} else if (n->right != nullptr) {
+	    return max(n->right);
+	
+	} else {
+	    return n->elem;
+	
+	}
     }
 
     BSNode<T>* remove_max(BSNode<T>* n) {
-        if (!n->right) {
-            BSNode<T>* temp = n->left;
-            delete n;
-            nelem--;
-            return temp;
-        }
-        n->right = remove_max(n->right);
-        return n;
+	if (n->right == nullptr){
+	    return n->left;
+		
+	} else {
+	    n->right = remove_max(n->right);
+	    return n;
+
+	}
     }
 
     void delete_cascade(BSNode<T>* n) {
-        if (n) {
+        if (n != nullptr) {
             delete_cascade(n->left);
             delete_cascade(n->right);
             delete n;

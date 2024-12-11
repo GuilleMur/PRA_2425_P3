@@ -7,28 +7,45 @@
 template <typename V> 
 class TableEntry {
     public:
-   	 std::string key;
-   	 V value;          
+        std::string key;
+        V value;
 
-    	TableEntry(std::string key, V value) : key(std::move(key)), value(std::move(value)) {}
+        TableEntry(std::string key, V value){
+            this->key = key;
+            this->value = value;
+        }
 
-	TableEntry(std::string key) : key(std::move(key)), value(V()) {}
+        TableEntry(std::string key){
+            this->key = key;
+	    this->value = V();
+        }
 
-    	TableEntry() : key(""), value(V()) {}
+        TableEntry(){
+            this->key = "";
+	    this->value = V();
+        }
 
-   	friend bool operator==(const TableEntry<V>& te1, const TableEntry<V>& te2) {
-        	return te1.key == te2.key;
-    	}
+        friend bool operator==(const TableEntry<V> &te1, const TableEntry<V> &te2){
+            return te1.key == te2.key;
+        }
 
-        friend bool operator!=(const TableEntry<V>& te1, const TableEntry<V>& te2) {
-        	return te1.key != te2.key;
-    	}
+        friend bool operator!=(const TableEntry<V> &te1, const TableEntry<V> &te2){
+            return te1.key != te2.key;
+        }
 
-    	friend std::ostream& operator<<(std::ostream& out, const TableEntry<V>& te) {
-        	out << "{" << te.key << " -> " << te.value << "}";
-        	return out;
-    	}
-    
+        friend std::ostream& operator<<(std::ostream &out, const TableEntry<V> &te){
+            out << te.key << " -> " << te.value;
+            return out;
+        }
+	
+
+	friend bool operator<(const TableEntry<V>& te1, const TableEntry<V>& te2) {
+ 	   return te1.key < te2.key;
+	}
+	friend bool operator>(const TableEntry<V>& te1, const TableEntry<V>& te2) {
+           return te1.key > te2.key;
+        }
+
 };
 
 #endif
